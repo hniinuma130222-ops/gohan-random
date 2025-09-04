@@ -4,15 +4,70 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ごはんランダム</title>
 <style>
-  :root{--pad:16px}
-  body{font-family:system-ui, sans-serif;margin:var(--pad);line-height:1.6}
-  h1{font-size:1.4rem;margin:.2rem 0 .6rem}
-  button{padding:12px 16px;border:1px solid #ccc;border-radius:12px;font-size:1rem;cursor:pointer}
-  input,textarea,select{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px}
-  .row{display:flex;gap:10px;align-items:center;margin:8px 0;flex-wrap:wrap}
-  .card{border:1px solid #eee;border-radius:14px;padding:14px;margin:14px 0;background:#fff}
-  .muted{color:#666;font-size:.9rem}
-  #result{font-size:1.2rem;font-weight:700;min-height:1.4em}
+ :root{
+  --pad:16px;
+  --accent:#e74c3c; /* 食欲をそそる赤 */
+  --bg:#f9f9f9;
+}
+body{
+  font-family: "Helvetica Neue", system-ui, sans-serif;
+  margin:var(--pad);
+  line-height:1.6;
+  background: var(--bg);
+}
+h1{
+  font-size:1.6rem;
+  font-weight:700;
+  margin:.2rem 0 1rem;
+  text-align:center;
+  color:#333;
+}
+button{
+  padding:12px 18px;
+  border:none;
+  border-radius:12px;
+  font-size:1rem;
+  cursor:pointer;
+  background: var(--accent);
+  color:#fff;
+  font-weight:600;
+  box-shadow:0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+button:hover{background:#c0392b;}
+button:active{transform:scale(0.95);}
+input,textarea,select{
+  width:100%;
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-size:1rem;
+}
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin:8px 0;
+  flex-wrap:wrap;
+}
+.card{
+  border:none;
+  border-radius:16px;
+  padding:16px;
+  margin:16px 0;
+  background:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+.muted{color:#666;font-size:.9rem}
+#result{
+  font-size:2rem;
+  font-weight:700;
+  text-align:center;
+  margin:20px 0;
+  color:var(--accent);
+  opacity:0;
+  transition: opacity 0.4s ease;
+}
 </style>
 <h1>ごはんランダム</h1>
 
@@ -46,41 +101,75 @@
 </div>
 
 <script>
-const DEFAULT = {"全部":["ラーメン","カレー","すし","焼肉","定食","パスタ","サラダ","そば","うどん","オムライス"]};
+const DEFAULT = {"🍽 全部":["🍜 ラーメン","🍛 カレー","🍣 すし","🥩 焼肉","🍱 定食","🍝 パスタ","🥗 サラダ","🍤 そば","🍲 うどん","🍳 オムライス"]};
 const LS_KEY="gohan.categories", LS_HIST="gohan.history", LS_LAST="gohan.last";
 const $ = s=>document.querySelector(s);
 const categoryEl=$("#category"), itemsEl=$("#items"), newCatEl=$("#newCat");
 const resultEl=$("#result"), historyEl=$("#history");
+
 let cats = JSON.parse(localStorage.getItem(LS_KEY) || "null") || DEFAULT;
 let hist = JSON.parse(localStorage.getItem(LS_HIST) || "[]");
 let last = localStorage.getItem(LS_LAST) || "";
 
+// ===== 日付フォーマット =====
+function fmtDateTime(ms){
+  const d = new Date(ms);
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  const hh = String(d.getHours()).padStart(2,"0");
+  const mm = String(d.getMinutes()).padStart(2,"0");
+  return `${y}/${m}/${day} ${hh}:${mm}`;
+}
 function saveCats(){ localStorage.setItem(LS_KEY, JSON.stringify(cats)); }
-function saveHist(){ localStorage.setItem(LS_HIST, JSON.stringify(hist.slice(-30))); }
-function renderCats(){ categoryEl.innerHTML = Object.keys(cats).map(c=>`<option>${c}</option>`).join(""); loadItems(); }
-function loadItems(){ itemsEl.value = (cats[categoryEl.value]||[]).join(","); }
-function renderHistory(){ historyEl.innerHTML = hist.slice().reverse().map(h=>`<li>${h.item} <span class="muted">(${h.cat})</span></li>`).join(""); }
+function saveHist(){ localStorage.setItem(LS_HIST, JSON.stringify(hist.slice(-100))); }
 
+// ===== 描画 =====
+function renderCats(){
+  categoryEl.innerHTML = Object.keys(cats).map(c=>`<option>${c}</option>`).join("");
+  loadItems();
+}
+function loadItems(){ itemsEl.value = (cats[categoryEl.value]||[]).join(","); }
+function renderHistory(){
+  const rows = hist.slice().reverse().map(h=>{
+    const timeMs = h.t || Date.now();
+    const stamp = h.d || fmtDateTime(timeMs);
+    return `<li>${stamp} — ${h.item} <span class="muted">(${h.cat})</span></li>`;
+  });
+  historyEl.innerHTML = rows.join("");
+}
+
+// ===== ランダム選択（被り防止） =====
 function pickRandom(list){
   if(!list.length) return null;
   if(list.length===1) return list[0];
   let pick;
-  for(let i=0;i<10;i++){ // 簡易・被り防止（最大10回トライ）
+  for(let i=0;i<10;i++){
     pick = list[(Math.random()*list.length)|0];
     if(pick!==last) break;
   }
   return pick;
 }
 
+// ===== イベント =====
 $("#spin").onclick = ()=>{
   const c = categoryEl.value;
   const list = (cats[c]||[]).map(x=>x.trim()).filter(Boolean);
-  if(!list.length){ resultEl.textContent="候補が空です。編集で追加してください。"; return; }
+  if(!list.length){ resultEl.textContent="候補が空です。編集で追加してください。"; resultEl.style.opacity=1; return; }
   const pick = pickRandom(list);
-  if(!pick){ resultEl.textContent="候補が1件のみのため抽選できません"; return; }
-  resultEl.textContent = pick;
+  if(!pick){ resultEl.textContent="候補が1件のみです"; resultEl.style.opacity=1; return; }
+
+  resultEl.style.opacity=0; // アニメーション
+  setTimeout(()=>{
+    resultEl.textContent = pick;
+    resultEl.style.opacity=1;
+  },200);
+
   last = pick; localStorage.setItem(LS_LAST, last);
-  hist.push({item: pick, cat: c, t: Date.now()}); saveHist(); renderHistory();
+  const now = Date.now();
+  const stamp = fmtDateTime(now);
+  hist.push({item: pick, cat: c, t: now, d: stamp});
+  saveHist(); renderHistory();
 };
 
 $("#reroll").onclick = ()=>$("#spin").click();
@@ -90,15 +179,20 @@ $("#openMaps").onclick = ()=>{
 };
 
 $("#addCat").onclick = ()=>{
-  const name = (newCatEl.value||"").trim(); if(!name) return;
+  const name = (newCatEl.value||"").trim();
+  if(!name) return;
   if(!cats[name]) cats[name]=[];
-  newCatEl.value=""; renderCats(); categoryEl.value = name; loadItems();
+  newCatEl.value="";
+  renderCats(); categoryEl.value = name; loadItems();
 };
 
 $("#save").onclick = ()=>{
   const c = categoryEl.value;
   cats[c] = itemsEl.value.split(",").map(s=>s.trim()).filter(Boolean);
-  saveCats(); resultEl.textContent = "保存しました"; setTimeout(()=>resultEl.textContent="",800);
+  saveCats();
+  resultEl.textContent = "保存しました";
+  resultEl.style.opacity=1;
+  setTimeout(()=>resultEl.style.opacity=0,1000);
 };
 
 $("#deleteCat").onclick = ()=>{
@@ -107,8 +201,12 @@ $("#deleteCat").onclick = ()=>{
   if(confirm(`${c} を削除しますか？`)){ delete cats[c]; saveCats(); renderCats(); }
 };
 
-$("#clearHistory").onclick = ()=>{ if(confirm("履歴を消しますか？")){ hist=[]; saveHist(); renderHistory(); }};
+$("#clearHistory").onclick = ()=>{
+  if(confirm("履歴を消しますか？")){ hist=[]; saveHist(); renderHistory(); }
+};
 categoryEl.onchange = loadItems;
 
+// 初期描画
 renderCats(); renderHistory();
+
 </script>
