@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ごはんランダム</title>
+<style>
+  :root{--pad:16px}
+  body{font-family:system-ui, sans-serif;margin:var(--pad);line-height:1.6}
+  h1{font-size:1.4rem;margin:.2rem 0 .6rem}
+  button{padding:12px 16px;border:1px solid #ccc;border-radius:12px;font-size:1rem;cursor:pointer}
+  input,textarea,select{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px}
+  .row{display:flex;gap:10px;align-items:center;margin:8px 0;flex-wrap:wrap}
+  .card{border:1px solid #eee;border-radius:14px;padding:14px;margin:14px 0;background:#fff}
+  .muted{color:#666;font-size:.9rem}
+  #result{font-size:1.2rem;font-weight:700;min-height:1.4em}
+</style>
+<h1>ごはんランダム</h1>
+
+<div class="card">
+  <div class="row">
+    <select id="category"></select>
+    <button id="spin">えいっ！</button>
+  </div>
+  <p id="result"></p>
+  <div class="row">
+    <button id="openMaps">近くで探す</button>
+    <button id="reroll">もう一回</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="font-size:1.1rem;margin:.2rem 0 .4rem">候補編集</h2>
+  <p class="muted">カンマ区切り（例：ラーメン,カレー,すし）</p>
+  <div class="row"><input id="newCat" placeholder="カテゴリ名（例：全部, 和食, 速攻）"><button id="addCat">カテゴリ追加</button></div>
+  <textarea id="items" rows="4" placeholder="このカテゴリの候補を入力"></textarea>
+  <div class="row">
+    <button id="save">保存</button>
+    <button id="deleteCat">カテゴリ削除</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="font-size:1.1rem;margin:.2rem 0 .4rem">履歴</h2>
+  <ol id="history"></ol>
+  <button id="clearHistory">履歴クリア</button>
+</div>
+
+<script>
+const DEFAULT = {"全部":["ラーメン","カレー","すし","焼肉","定食","パスタ","サラダ","そば","うどん","オムライス"]};
+const LS_KEY="gohan.categories", LS_HIST="gohan.history", LS_LAST="gohan.last";
+const $ = s=>document.querySelector(s);
+const categoryEl=$("#category"), itemsEl=$("#items"), newCatEl=$("#newCat");
+const resultEl=$("#result"), historyEl=$("#history");
+let cats = JSON.parse(localStorage.getItem(LS_KEY) || "null") || DEFAULT;
+let hist = JSON.parse(localStorage.getItem(LS_HIST) || "[]");
+let last = localStorage.getItem(LS_LAST) || "";
+
+function saveCats(){ localStorage.setItem(LS_KEY, JSON.stringify(cats)); }
+function saveHist(){ localStorage.setItem(LS_HIST, JSON.stringify(hist.slice(-30))); }
+function renderCats(){ categoryEl.innerHTML = Object.keys(cats).map(c=>`<option>${c}</option>`).join(""); loadItems(); }
+function loadItems(){ itemsEl.value = (cats[categoryEl.value]||[]).join(","); }
+function renderHistory(){ historyEl.innerHTML = hist.slice().reverse().map(h=>`<li>${h.item} <span class="muted">(${h.cat})</span></li>`).join(""); }
+
+function pickRandom(list){
+  if(!list.length) return null;
+  if(list.length===1) return list[0];
+  let pick;
+  for(let i=0;i<10;i++){ // 簡易・被り防止（最大10回トライ）
+    pick = list[(Math.random()*list.length)|0];
+    if(pick!==last) break;
+  }
+  return pick;
+}
+
+$("#spin").onclick = ()=>{
+  const c = categoryEl.value;
+  const list = (cats[c]||[]).map(x=>x.trim()).filter(Boolean);
+  if(!list.length){ resultEl.textContent="候補が空です。編集で追加してください。"; return; }
+  const pick = pickRandom(list);
+  if(!pick){ resultEl.textContent="候補が1件のみのため抽選できません"; return; }
+  resultEl.textContent = pick;
+  last = pick; localStorage.setItem(LS_LAST, last);
+  hist.push({item: pick, cat: c, t: Date.now()}); saveHist(); renderHistory();
+};
+
+$("#reroll").onclick = ()=>$("#spin").click();
+$("#openMaps").onclick = ()=>{
+  const q = (resultEl.textContent || "ランチ");
+  location.href = `https://www.google.com/maps/search/${encodeURIComponent(q)}`;
+};
+
+$("#addCat").onclick = ()=>{
+  const name = (newCatEl.value||"").trim(); if(!name) return;
+  if(!cats[name]) cats[name]=[];
+  newCatEl.value=""; renderCats(); categoryEl.value = name; loadItems();
+};
+
+$("#save").onclick = ()=>{
+  const c = categoryEl.value;
+  cats[c] = itemsEl.value.split(",").map(s=>s.trim()).filter(Boolean);
+  saveCats(); resultEl.textContent = "保存しました"; setTimeout(()=>resultEl.textContent="",800);
+};
+
+$("#deleteCat").onclick = ()=>{
+  const c = categoryEl.value;
+  if(Object.keys(cats).length===1){ alert("最後のカテゴリは削除できません"); return; }
+  if(confirm(`${c} を削除しますか？`)){ delete cats[c]; saveCats(); renderCats(); }
+};
+
+$("#clearHistory").onclick = ()=>{ if(confirm("履歴を消しますか？")){ hist=[]; saveHist(); renderHistory(); }};
+categoryEl.onchange = loadItems;
+
+renderCats(); renderHistory();
+</script>
