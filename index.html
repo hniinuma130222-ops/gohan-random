@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!doctype html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="ja"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;meta charset="utf-8"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;meta name="viewport" content="width=device-width,initial-scale=1"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;title&gt;ごはんランダム&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1">&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>:root{--pad:16px}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>body{font-family:system-ui, sans-serif;margin:var(--pad);line-height:1.6}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>h1{font-size:1.4rem;margin:.2rem 0 .6rem}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>button{padding:12px 16px;border:1px solid #ccc;border-radius:12px;font-size:1rem;cursor:pointer}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>input,textarea,select{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.row{display:flex;gap:10px;align-items:center;margin:8px 0;flex-wrap:wrap}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.card{border:1px solid #eee;border-radius:14px;padding:14px;margin:14px 0;background:#fff}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.muted{color:#666;font-size:.9rem}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>#result{font-size:1.2rem;font-weight:700;min-height:1.4em}</span></p>
+<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h1&gt;ごはんランダム&lt;/h1&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="row"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;select id="category"&gt;&lt;/select&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="spin"&gt;えいっ！&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;p id="result"&gt;&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="row"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="openMaps"&gt;近くで探す&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="reroll"&gt;もう一回&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;h2 style="font-size:1.1rem;margin:.2rem 0 .4rem"&gt;候補編集&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;p class="muted"&gt;カンマ区切り（例：ラーメン,カレー,すし）&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="row"&gt;&lt;input id="newCat" placeholder="カテゴリ名（例：全部, 和食, 速攻）"&gt;&lt;button id="addCat"&gt;カテゴリ追加&lt;/button&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;textarea id="items" rows="4" placeholder="このカテゴリの候補を入力"&gt;&lt;/textarea&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="row"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="save"&gt;保存&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="deleteCat"&gt;カテゴリ削除&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;h2 style="font-size:1.1rem;margin:.2rem 0 .4rem"&gt;履歴&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;ol id="history"&gt;&lt;/ol&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;button id="clearHistory"&gt;履歴クリア&lt;/button&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;script&gt;</span></p>
+<p class="p1"><span class="s1">const DEFAULT = {"全部":["ラーメン","カレー","すし","焼肉","定食","パスタ","サラダ","そば","うどん","オムライス"]};</span></p>
+<p class="p1"><span class="s1">const LS_KEY="gohan.categories", LS_HIST="gohan.history", LS_LAST="gohan.last";</span></p>
+<p class="p1"><span class="s1">const $ = s=&gt;document.querySelector(s);</span></p>
+<p class="p1"><span class="s1">const categoryEl=$("#category"), itemsEl=$("#items"), newCatEl=$("#newCat");</span></p>
+<p class="p1"><span class="s1">const resultEl=$("#result"), historyEl=$("#history");</span></p>
+<p class="p1"><span class="s1">let cats = JSON.parse(localStorage.getItem(LS_KEY) || "null") || DEFAULT;</span></p>
+<p class="p1"><span class="s1">let hist = JSON.parse(localStorage.getItem(LS_HIST) || "[]");</span></p>
+<p class="p1"><span class="s1">let last = localStorage.getItem(LS_LAST) || "";</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">function saveCats(){ localStorage.setItem(LS_KEY, JSON.stringify(cats)); }</span></p>
+<p class="p1"><span class="s1">function saveHist(){ localStorage.setItem(LS_HIST, JSON.stringify(hist.slice(-30))); }</span></p>
+<p class="p1"><span class="s1">function renderCats(){ categoryEl.innerHTML = Object.keys(cats).map(c=&gt;`&lt;option&gt;${c}&lt;/option&gt;`).join(""); loadItems(); }</span></p>
+<p class="p1"><span class="s1">function loadItems(){ itemsEl.value = (cats[categoryEl.value]||[]).join(","); }</span></p>
+<p class="p1"><span class="s1">function renderHistory(){ historyEl.innerHTML = hist.slice().reverse().map(h=&gt;`&lt;li&gt;${h.item} &lt;span class="muted"&gt;(${h.cat})&lt;/span&gt;&lt;/li&gt;`).join(""); }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">function pickRandom(list){</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if(!list.length) return null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if(list.length===1) return list[0];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let pick;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>for(let i=0;i&lt;10;i++){ // 簡易・被り防止（最大10回トライ）</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>pick = list[(Math.random()*list.length)|0];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if(pick!==last) break;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return pick;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">$("#spin").onclick = ()=&gt;{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const c = categoryEl.value;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const list = (cats[c]||[]).map(x=&gt;x.trim()).filter(Boolean);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if(!list.length){ resultEl.textContent="候補が空です。編集で追加してください。"; return; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const pick = pickRandom(list);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if(!pick){ resultEl.textContent="候補が1件のみのため抽選できません"; return; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>resultEl.textContent = pick;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>last = pick; localStorage.setItem(LS_LAST, last);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>hist.push({item: pick, cat: c, t: Date.now()}); saveHist(); renderHistory();</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">$("#reroll").onclick = ()=&gt;$("#spin").click();</span></p>
+<p class="p1"><span class="s1">$("#openMaps").onclick = ()=&gt;{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const q = (resultEl.textContent || "ランチ");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>location.href = `https://www.google.com/maps/search/${encodeURIComponent(q)}`;</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">$("#addCat").onclick = ()=&gt;{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const name = (newCatEl.value||"").trim(); if(!name) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if(!cats[name]) cats[name]=[];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>newCatEl.value=""; renderCats(); categoryEl.value = name; loadItems();</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">$("#save").onclick = ()=&gt;{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const c = categoryEl.value;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>cats[c] = itemsEl.value.split(",").map(s=&gt;s.trim()).filter(Boolean);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>saveCats(); resultEl.textContent = "保存しました"; setTimeout(()=&gt;resultEl.textContent="",800);</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">$("#deleteCat").onclick = ()=&gt;{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const c = categoryEl.value;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if(Object.keys(cats).length===1){ alert("最後のカテゴリは削除できません"); return; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if(confirm(`${c} を削除しますか？`)){ delete cats[c]; saveCats(); renderCats(); }</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">$("#clearHistory").onclick = ()=&gt;{ if(confirm("履歴を消しますか？")){ hist=[]; saveHist(); renderHistory(); }};</span></p>
+<p class="p1"><span class="s1">categoryEl.onchange = loadItems;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">renderCats(); renderHistory();</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+</body>
+</html>
